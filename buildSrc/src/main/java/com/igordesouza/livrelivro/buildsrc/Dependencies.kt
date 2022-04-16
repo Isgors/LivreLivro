@@ -88,6 +88,8 @@ object Libs {
         }
 
         object Navigation {
+            const val composeDestinations = "io.github.raamcosta.compose-destinations:animations-core:1.4.4-beta"
+            const val kspDestinations = "io.github.raamcosta.compose-destinations:ksp:1.4.4-beta"
             const val navigationCompose = "androidx.navigation:navigation-compose:$version"
             const val fragment = "androidx.navigation:navigation-fragment-ktx:$version"
             const val uiKtx = "androidx.navigation:navigation-ui-ktx:$version"
