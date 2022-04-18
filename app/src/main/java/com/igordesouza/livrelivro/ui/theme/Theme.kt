@@ -8,6 +8,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.platform.LocalContext
+import com.igordesouza.livrelivro.ui.LocalSpacing
+import com.igordesouza.livrelivro.ui.Spacing
 
 private val LightThemeColors = lightColorScheme(
 
@@ -90,10 +92,8 @@ fun LivreLivroTheme(
         colorScheme = myColorScheme,
         typography = AppTypography
     ) {
-        // TODO (M3): MaterialTheme doesn't provide LocalIndication, remove when it does
-        val rippleIndication = rememberRipple()
         CompositionLocalProvider(
-            LocalIndication provides rippleIndication,
+            LocalSpacing provides Spacing(),
             content = content
         )
     }
