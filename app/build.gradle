@@ -5,28 +5,20 @@ plugins {
     id 'com.android.application'
     id 'kotlin-android'
     id 'kotlin-parcelize'
-    id 'com.google.devtools.ksp' version '1.6.10-1.0.2' // Depends on your kotlin version
-
+    id 'com.google.devtools.ksp' version '1.7.20-1.0.8' // Depends on your kotlin version
 }
 
-kotlin {
-    sourceSets {
-        debug {
-            kotlin.srcDir("build/generated/ksp/debug/kotlin")
-        }
-        release {
-            kotlin.srcDir("build/generated/ksp/release/kotlin")
-        }
-    }
-}
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'com.google.devtools.ksp'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 33
 
     defaultConfig {
         applicationId "com.igordesouza.livrelivro"
-        minSdk 27
-        targetSdk 31
+        minSdk 23
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -47,11 +39,6 @@ android {
         }
     }
 
-//    compileOptions {
-//        sourceCompatibility JavaVersion.VERSION_1_8
-//        targetCompatibility JavaVersion.VERSION_1_8
-//    }
-
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_11.toString()
     }
@@ -66,8 +53,28 @@ android {
         shaders false
     }
 
+    sourceSets {
+        main.java.srcDirs += 'src/main/kotlin'
+        test.java.srcDirs += 'src/test/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
     composeOptions {
+        kotlinCompilerVersion = Libs.Kotlin.version
         kotlinCompilerExtensionVersion Libs.AndroidX.Compose.version
+    }
+
+    applicationVariants.all { variant ->
+        kotlin.sourceSets {
+            getByName(variant.name) {
+                kotlin.srcDir("build/generated/ksp/${variant.name}/kotlin")
+            }
+        }
     }
 
     // Always show the result of every unit test, even if it passes.
@@ -94,11 +101,12 @@ android {
 dependencies {
     implementation Libs.Kotlin.stdlib
     implementation Libs.Coroutines.android
+    implementation Libs.Coroutines.core
+    testImplementation Libs.Coroutines.test
 
-    implementation Libs.AndroidX.Activity.activityCompose
+    api Libs.AndroidX.Activity.activityCompose
     implementation Libs.AndroidX.coreKtx
     implementation Libs.AndroidX.appcompat
-    implementation Libs.AndroidX.Lifecycle.livedata
     implementation Libs.AndroidX.Lifecycle.viewModelCompose
     implementation Libs.AndroidX.Navigation.fragment
     implementation Libs.AndroidX.Navigation.uiKtx
@@ -110,12 +118,20 @@ dependencies {
     implementation Libs.AndroidX.Compose.Material3.material3
     implementation Libs.AndroidX.Compose.materialIconsExtended
     implementation Libs.AndroidX.Compose.tooling
+    implementation Libs.AndroidX.Compose.toolingPreview
     implementation Libs.AndroidX.Compose.uiUtil
-    implementation Libs.AndroidX.Compose.runtime
-    implementation Libs.AndroidX.Compose.runtimeLivedata
-    implementation Libs.AndroidX.Compose.viewBinding
+    api Libs.AndroidX.Compose.ui
+    api Libs.AndroidX.Compose.runtime
+    api Libs.AndroidX.Compose.foundation
 
     implementation Libs.Accompanist.insets
+
+    implementation Libs.AndroidX.Koin.android
+    implementation Libs.AndroidX.Koin.core
+    implementation Libs.AndroidX.Koin.compose
+
+    implementation Libs.AndroidX.Navigation.composeDestinations
+    ksp Libs.AndroidX.Navigation.kspDestinations
 
     debugImplementation Libs.AndroidX.Compose.uiTestManifest
 
@@ -125,9 +141,6 @@ dependencies {
     androidTestImplementation Libs.AndroidX.Test.rules
     androidTestImplementation Libs.AndroidX.Test.Ext.junit
     androidTestImplementation Libs.AndroidX.Compose.uiTest
-
-    implementation Libs.AndroidX.Navigation.composeDestinations
-    ksp Libs.AndroidX.Navigation.kspDestinations
 
     // androidx.test is forcing JUnit, 4.12. This forces it to use 4.13
     configurations.configureEach {
